@@ -66,9 +66,8 @@ io.on('connection', socket => {
       io.emit('start-game')
 
       const wordFactoryArray = generateRandomWordFactory()
-      setTimeout(() => {
-        io.emit('word-factory-array', wordFactoryArray)
-      }, 500)
+
+      io.emit('word-factory-array', wordFactoryArray)
     }
   })
 
