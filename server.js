@@ -23,6 +23,7 @@ const PORT = process.env.PORT || 8080
 
 let qeueingPlayersData = []
 let tallyResult = []
+let startCountdownID = ''
 
 io.on('connection', socket => {
   socket.on('new-player', playerName => {
@@ -54,21 +55,27 @@ io.on('connection', socket => {
     io.emit('player-update', qeueingPlayersData)
 
     //CHECK IF EVERY PLAYER IS READY,,, IF SO STARTGAME
-    if (
+    const condition = () =>
       qeueingPlayersData.every(v => v.ready === true) &&
       qeueingPlayersData.length > 1
-    ) {
-      qeueingPlayersData = qeueingPlayersData.map(v => ({
-        ...v,
-        ready: false,
-        playing: true,
-      }))
-      io.emit('start-game')
 
-      const wordFactoryArray = generateRandomWordFactory()
+    clearTimeout(startCountdownID)
 
-      io.emit('word-factory-array', wordFactoryArray)
-    }
+    if (condition())
+      startCountdownID = setTimeout(() => {
+        if (condition()) {
+          qeueingPlayersData = qeueingPlayersData.map(v => ({
+            ...v,
+            ready: false,
+            playing: true,
+          }))
+          io.emit('start-game')
+
+          const wordFactoryArray = generateRandomWordFactory()
+
+          io.emit('word-factory-array', wordFactoryArray)
+        }
+      }, 4000)
   })
 
   socket.on('name-update', data => {
@@ -82,6 +89,8 @@ io.on('connection', socket => {
   //TALLYING
   socket.on('found-words', foundWords => {
     if (tallyResult.some(v => v.id === socket.id)) return
+
+    console.log(foundWords)
 
     const playerName = qeueingPlayersData.find(v => v.id === socket.id).name
     const result = scoreTally(foundWords, socket.id, playerName)
