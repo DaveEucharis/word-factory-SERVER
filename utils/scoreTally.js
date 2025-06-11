@@ -31,7 +31,7 @@ function scoreTally(tallyResult) {
 
     for (let j = 0; j < foundWords.length; j++) {
       const word = foundWords[j]
-      const isValid = validWord.check(word)
+      const isValid = validWord.check(word.toLowerCase())
 
       if (isValid) validWords.push(word)
 
@@ -64,6 +64,13 @@ function scoreTally(tallyResult) {
 
   return newResult
 }
+
+// const data = scoreTally([
+//   { foundWords: ['zip', 'fart', 'like'], id: 'sfss', name: 'more' },
+//   { foundWords: ['end', 'zip', 'like', 'goose'], id: 'sfs', name: 'morgan' },
+// ])
+
+// console.log(data)
 
 module.exports = {
   scoreTally,

@@ -99,9 +99,9 @@ io.on('connection', socket => {
     const playingPlayers = countPlaying(qeueingPlayersData)
 
     if (playingPlayers === tallyResult.length) {
-      tallyResult = scoreTally(tallyResult)
+      const talliedData = scoreTally(tallyResult)
 
-      io.emit('tally-result', tallyResult)
+      io.emit('tally-result', talliedData)
     }
   })
 
