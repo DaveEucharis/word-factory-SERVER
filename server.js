@@ -71,6 +71,8 @@ io.on('connection', socket => {
           }))
           io.emit('start-game')
 
+          tallyResult = []
+
           const wordFactoryArray = generateRandomWordFactory()
 
           io.emit('word-factory-array', wordFactoryArray)
@@ -90,19 +92,16 @@ io.on('connection', socket => {
   socket.on('found-words', foundWords => {
     if (tallyResult.some(v => v.id === socket.id)) return
 
-    console.log(foundWords)
-
     const playerName = qeueingPlayersData.find(v => v.id === socket.id).name
-    const result = scoreTally(foundWords, socket.id, playerName)
-    tallyResult.push(result)
+
+    tallyResult.push({ foundWords, id: socket.id, name: playerName })
 
     const playingPlayers = countPlaying(qeueingPlayersData)
 
-    if (tallyResult.length === playingPlayers) {
-      tallyResult.sort((a, b) => b.score - a.score)
+    if (playingPlayers === tallyResult.length) {
+      tallyResult = scoreTally(tallyResult)
 
       io.emit('tally-result', tallyResult)
-      tallyResult = []
     }
   })
 

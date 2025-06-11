@@ -1,18 +1,68 @@
 const isWord = require('is-word')
 const validWord = isWord('american-english')
 
-function scoreTally(foundWords, id, name) {
-  const output = { result: [], score: 0, id, name }
+function getDuplicates(arr) {
+  const newArr = []
+  const result = []
 
-  for (let i = 0; i < foundWords.length; i++) {
-    const word = foundWords[i].toLowerCase()
-    const isValid = validWord.check(word)
-    output.result.push({ word, valid: isValid })
+  for (let i = 0; i < arr.length; i++) {
+    if (newArr.includes(arr[i]) && !result.includes(arr[i])) {
+      result.push(arr[i])
+      continue
+    }
 
-    if (isValid) output.score += foundWords[i].length - 2
+    newArr.push(arr[i])
   }
 
-  return output
+  return result
+}
+
+function scoreTally(tallyResult) {
+  // const output = { result: [], score: 0, id, name }
+  // output.result.push({ word, valid: isValid, unique: isUnique })
+  // tallyResult.push({ foundWords, id: socket.id, name: playerName })
+  const newResult = []
+  const validWords = []
+
+  for (let i = 0; i < tallyResult.length; i++) {
+    const { name, id, foundWords } = tallyResult[i]
+
+    const output = { result: [], score: 0, id, name }
+
+    for (let j = 0; j < foundWords.length; j++) {
+      const word = foundWords[j]
+      const isValid = validWord.check(word)
+
+      if (isValid) validWords.push(word)
+
+      output.result.push({ word, valid: isValid, unique: true })
+    }
+
+    newResult.push(output)
+  }
+
+  const dupes = getDuplicates(validWords)
+
+  for (let i = 0; i < newResult.length; i++) {
+    const { result } = newResult[i]
+
+    for (let j = 0; j < result.length; j++) {
+      const { word, valid } = result[j]
+
+      if (!valid) continue
+
+      if (dupes.includes(word)) {
+        newResult[i].result[j].unique = false
+        continue
+      }
+
+      newResult[i].score += word.length - 2
+    }
+  }
+
+  newResult.sort((a, b) => b.score - a.score)
+
+  return newResult
 }
 
 module.exports = {
