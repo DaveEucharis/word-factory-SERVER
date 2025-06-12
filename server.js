@@ -92,7 +92,8 @@ io.on('connection', socket => {
   socket.on('found-words', foundWords => {
     if (tallyResult.some(v => v.id === socket.id)) return
 
-    const playerName = qeueingPlayersData.find(v => v.id === socket.id).name
+    const playerName =
+      qeueingPlayersData.filter(v => v.id === socket.id).name && 'NameError'
 
     tallyResult.push({ foundWords, id: socket.id, name: playerName })
 
